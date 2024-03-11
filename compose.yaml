@@ -1,0 +1,64 @@
+services:
+    host-A:
+        image: #image-on-hub
+        networks:
+            - route-6:
+            - route-1:
+    host-B:
+        image: #image-on-hub
+        networks:        
+            - route-1:
+            - route-2:
+    host-C:
+        image: #image-on-hub
+        networks:        
+            - route-2:
+            - route-3:                    
+    host-D:
+        image: #image-on-hub
+        networks:        
+            - route-3:
+            - route-4:                    
+    host-E:
+        image: #image-on-hub
+        networks:        
+            - route-4:
+            - route-5:                    
+    host-F:
+        image: #image-on-hub
+        networks:        
+            - route-5:
+            - route-6:                    
+
+networks:
+    route-1:
+        internal: true
+        ipam:
+            config:
+                - subnet: 192.168.1.0/24
+    route-2:
+        internal: true
+        ipam:
+            config:
+                - subnet: 192.168.2.0/24
+    route-3:
+        internal: true
+        ipam:
+            config:
+                - subnet: 192.168.3.0/24
+    route-4:
+        internal: true
+        ipam:
+            config:
+                - subnet: 192.168.4.0/24
+    route-5:
+        internal: true
+        ipam:
+            config:
+                - subnet: 192.168.5.0/24
+    route-6:
+        internal: true
+        ipam:
+            config:
+                - subnet: 192.168.6.0/24
+
