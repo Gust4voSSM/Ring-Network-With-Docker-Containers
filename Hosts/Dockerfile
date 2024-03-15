@@ -1,4 +1,6 @@
-FROM python:3.10-alpine
+ARG PYTHON_VERSION=3.10
+
+FROM python:${PYTHON_VERSION}-alpine as host-a
 
 WORKDIR /host
 
@@ -8,4 +10,5 @@ RUN pip3 install --no-cache-dir -r requirements.txt
 
 COPY . .
 
-CMD ["flask", "run"]
+ENTRYPOINT /bin/sh
+
