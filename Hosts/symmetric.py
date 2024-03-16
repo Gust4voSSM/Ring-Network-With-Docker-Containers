@@ -1,12 +1,11 @@
 from Crypto.Cipher import AES
 from Crypto.Random import get_random_bytes
 
-def symmetric_key_encrypt(data):
+def symmetric_key_encrypt(data, shared_key):
     data = data.encode("utf-8")
-    key = get_random_bytes(32)
-    cipher = AES.new(key, AES.MODE_EAX)
-    ciphertext, tag = cipher.encrypt_and_digest(data)
-    return [ciphertext, key, cipher.nonce, tag]
+    cipher = AES.new(shared_key, AES.MODE_EAX)
+    cipher_text, tag = cipher.encrypt_and_digest(data)
+    return [cipher_text, shared_key, cipher.nonce, tag]
 
 def symmetric_key_decrypt(infos):
     cipher = AES.new(infos[1], AES.MODE_EAX, infos[2])
