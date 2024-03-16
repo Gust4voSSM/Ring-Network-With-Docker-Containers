@@ -11,10 +11,10 @@ PREV, NEXT, SRC, DST = 2*[*range(2)]
 prefix = "192.168"
 
 ip = [[int,int],[int, int]] # matrix 2x2
-ip[SRC][PREV] = f"{prefix}.{(id-2)%6}.1{id }"
-ip[SRC][NEXT] = f"{prefix}.{(id-1)%6}.1{id }"
-ip[DST][PREV] = f"{prefix}.{(id-2)%6}.1{(id-2)%6 + 1}"
-ip[DST][NEXT] = f"{prefix}.{(id-1)%6}.1{(id)%6 + 1}"
+ip[SRC][PREV] = f"{prefix}.{(id-2)%6}.3"
+ip[SRC][NEXT] = f"{prefix}.{(id-1)%6}.2"
+ip[DST][PREV] = f"{prefix}.{(id-2)%6}.2"
+ip[DST][NEXT] = f"{prefix}.{(id-1)%6}.3"
 
 print(f"""\
 Seus IPs:      {', '.join(ip[0])}
