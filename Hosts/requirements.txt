@@ -2,3 +2,5 @@ numpy
 pycryptodome
 cryptography
 sympy
+pickle
+typing
