@@ -10,14 +10,16 @@ def symmetric_key_encrypt(data, shared_key):
     return [cipher_text, cipher.nonce, tag]
     #Retorna uma lista que deve ser enviada para o outro lado
 
-def symmetric_key_decrypt(infos, shared_key):
-    cipher = AES.new(shared_key, AES.MODE_EAX, infos[1])
-    data = cipher.decrypt_and_verify(infos[0], infos[2])
-    return data.decode("utf-8") 
+def symmetric_key_decrypt(cipher_text, nonce, tag, shared_key):
+    cipher = AES.new(shared_key, AES.MODE_EAX, nonce)
+    data = cipher.decrypt_and_verify(cipher_text, tag)
+    return data.decode("utf-8")
+
     #Descriptografa a lista recebida do outro lado e retorna a mensagem em texto
 
 def diffie_hellman(socke, tuple):
     random_1 = randprime(1, 2000)
+    print("waiting for diffie")
     socke.sendto(str(random_1).encode(), tuple)
     random_2 = int(socke.recv(2048).decode())
     if (random_1 > random_2):
@@ -25,7 +27,7 @@ def diffie_hellman(socke, tuple):
  
     private_key = randint(1, 2000)
     public_key = random_1**private_key % random_2
-    print("...") #ver esse "bug"
+    print("diffie hellman realizado") #ver esse "bug"
 
     socke.sendto(str(public_key).encode(), tuple)
     other_public_key = int(socke.recv(2048).decode())
