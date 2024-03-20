@@ -25,11 +25,7 @@ Seus vizinhos: {', '.join(ip[1])}\
 if(id == 1):
     app = App((ip[SRC][PREV], ip[SRC][NEXT]), (ip[DST][PREV], ip[DST][NEXT]), "192.168.0.4")
     wait = input("Espere todos os binds terminarem")
-    '''
-    wait = input("Binds finalizados")
-    app.server_sockets[ip[SRC][NEXT]].sendto("Oi testando".encode(), (ip[DST][NEXT], 8000))
-    print("enviado")
-    '''
+
     print("enviando mensagem...")
     app.send_message_next("Olá a mensagem chegou?")
     print("mensagem enviada")
@@ -38,12 +34,6 @@ if(id == 1):
 elif (id == 2):
     app = App((ip[SRC][PREV], ip[SRC][NEXT]), (ip[DST][PREV], ip[DST][NEXT]), "192.168.1.4")
     wait = input("Espere todos os binds terminarem")
-    '''
-    wait = input("Binds finalizados")
-    messagem, a = app.server_sockets[ip[SRC][PREV]].recvfrom(4096)
-    print(messagem.decode())
-    print("recebida")
-    '''
 
     print("recebendo mensagem...")
     mensagem = app.receive_from_prev()
