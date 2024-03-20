@@ -20,8 +20,9 @@ print(f"""\
 Seus IPs:      {', '.join(ip[0])}
 Seus vizinhos: {', '.join(ip[1])}\
 """)
-next = ip[1][1]
-prev = ip[1][0]
+wait = input("Start")
+next = ip[0][1]
+prev = ip[0][0]
 
 app = App(ip[0], ip[1], "192.167.423")
 message = app.receive_message(prev)

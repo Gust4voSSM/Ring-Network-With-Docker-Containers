@@ -16,9 +16,9 @@ def symmetric_key_decrypt(infos, shared_key):
     return data.decode("utf-8") 
     #Descriptografa a lista recebida do outro lado e retorna a mensagem em texto
 
-def diffie_hellman(socke):
+def diffie_hellman(socke, tuple):
     random_1 = randprime(1, 2000)
-    socke.send(str(random_1).encode())
+    socke.sendto(str(random_1).encode(), tuple)
     random_2 = int(socke.recv(2048).decode())
     if (random_1 > random_2):
         random_1, random_2 = random_2, random_1
@@ -27,7 +27,7 @@ def diffie_hellman(socke):
     public_key = random_1**private_key % random_2
     print("...") #ver esse "bug"
 
-    socke.send(str(public_key).encode())
+    socke.sendto(str(public_key).encode(), tuple)
     other_public_key = int(socke.recv(2048).decode())
     
     shared_key = other_public_key**private_key % random_2

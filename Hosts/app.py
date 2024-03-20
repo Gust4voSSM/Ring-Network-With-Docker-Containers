@@ -20,7 +20,7 @@ class App:
             server_socket.bind((ip, SERVER_PORT))
             self.server_sockets[ip] = server_socket
             #Antes de fazer o diffie tem que checar a autenticidade com a autoridade certificadora 
-            self.shared_keys[ip] = diffie_hellman(self.server_sockets[ip])
+            self.shared_keys[ip] = diffie_hellman(self.server_sockets[ip], (ip, SERVER_PORT))
 
     def send_message(self, receiver: str, message: str):
         socket = self.server_sockets[receiver]

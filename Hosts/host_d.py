@@ -20,4 +20,4 @@ print(f"""\
 Seus IPs:      {', '.join(ip[0])}
 Seus vizinhos: {', '.join(ip[1])}\
 """)
-_ = input("aperte enter para sair\n")
+wait = input("Start")
