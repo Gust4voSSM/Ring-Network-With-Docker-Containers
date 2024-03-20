@@ -21,9 +21,10 @@ Seus IPs:      {', '.join(ip[0])}
 Seus vizinhos: {', '.join(ip[1])}\
 """)
 wait = input("Start")
-next = ip[0][1]
-prev = ip[0][0]
 
-app = App(ip[0], ip[1], "192.167.423")
-message = app.receive_message(prev)
-print(message)
+if(id == 1):
+    app = App((ip[SRC][PREV], ip[SRC][NEXT]), (ip[DST][PREV], ip[DST][NEXT]), "192.167.423")
+    app.send_message(ip[DST][NEXT], "Olá, a mensagem chegou?")
+else if (id == 2):
+     app = App((ip[SRC][PREV], ip[SRC][NEXT]), (ip[DST][PREV], ip[DST][NEXT]), "192.167.423")
+    app.receive_message(ip[DST][PREV])
