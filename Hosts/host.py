@@ -20,11 +20,16 @@ print(f"""\
 Seus IPs:      {', '.join(ip[0])}
 Seus vizinhos: {', '.join(ip[1])}\
 """)
-wait = input("Start")
+app = App((ip[SRC][PREV], ip[SRC][NEXT]), (ip[DST][PREV], ip[DST][NEXT]), "192.167.423")
+mensagem = ""
 
 if(id == 1):
-    app = App((ip[SRC][PREV], ip[SRC][NEXT]), (ip[DST][PREV], ip[DST][NEXT]), "192.167.423")
-    app.send_message(ip[DST][NEXT], "Olá, a mensagem chegou?")
+    mensagem = "Olá, a mensagem chegou?"
+    app.send_message(ip[DST][NEXT], mensagem)
+    print(f"mensagem enviada {mensagem}")
+
 elif (id == 2):
-    app = App((ip[SRC][PREV], ip[SRC][NEXT]), (ip[DST][PREV], ip[DST][NEXT]), "192.167.423")
-    app.receive_message(ip[DST][PREV])
+    mensagem = app.receive_message(ip[DST][PREV])
+    print(f"mensagem recebida {mensagem}")
+
+wait = input("Start")
