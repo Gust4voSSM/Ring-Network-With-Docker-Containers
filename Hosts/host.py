@@ -22,39 +22,17 @@ Seus vizinhos: {'e '.join(ip[1])}\
 """)
 
 
-if(id == 1):
-    app = App((ip[SRC][PREV], ip[SRC][NEXT]), (ip[DST][PREV], ip[DST][NEXT]), "192.168.0.4")
-    wait = input("Espere todos os binds terminarem")
+app = App((ip[SRC][PREV], ip[SRC][NEXT]), (ip[DST][PREV], ip[DST][NEXT]), "192.167.423")
+mensagem = ""
 
-    print("enviando mensagem...")
-    app.send_message_next("Olá a mensagem chegou?")
-    print("mensagem enviada")
-    
+if(id == 1):
+    mensagem = "Olá, a mensagem chegou?"
+    app.send_message(ip[DST][NEXT], mensagem)
+    print(f"mensagem enviada {mensagem}")
 
 elif (id == 2):
-    app = App((ip[SRC][PREV], ip[SRC][NEXT]), (ip[DST][PREV], ip[DST][NEXT]), "192.168.1.4")
-    wait = input("Espere todos os binds terminarem")
+    mensagem = app.receive_message(ip[DST][PREV])
+    print(f"mensagem recebida {mensagem}")
 
-    print("recebendo mensagem...")
-    mensagem = app.receive_from_prev()
-    print(f"mensagem recebida: {mensagem}")
-    
-
-elif (id == 3):
-    app = App((ip[SRC][PREV], ip[SRC][NEXT]), (ip[DST][PREV], ip[DST][NEXT]), "192.168.2.4")
-    wait = input("Espere todos os binds terminarem")
-
-elif (id == 4):
-    app = App((ip[SRC][PREV], ip[SRC][NEXT]), (ip[DST][PREV], ip[DST][NEXT]), "192.168.3.4")
-    wait = input("Espere todos os binds terminarem")
-
-elif (id == 5):
-    app = App((ip[SRC][PREV], ip[SRC][NEXT]), (ip[DST][PREV], ip[DST][NEXT]), "192.168.4.4")
-    wait = input("Espere todos os binds terminarem")
-
-else:   
-    app = App((ip[SRC][PREV], ip[SRC][NEXT]), (ip[DST][PREV], ip[DST][NEXT]), "192.168.5.4")
-    wait = input("Espere todos os binds terminarem")
-
-wait = input("Enter to end")
+wait = input("Start")
 app.kill_both()
