@@ -1,9 +1,9 @@
 from sys import argv as args
 from app import App
-from threading import Thread
+from threading import Thread, lock
 from os import getenv
 
-mensagem = ""
+mensagem = "" #Depois usa o lock pra controlar o acesso a mensagem, ou pensa em outro jeito de sair do loop
 
 def enviando(app : App):
     global mensagem 
@@ -21,7 +21,7 @@ def recebendo_atras(app : App):
     while mensagem != "sair":
         message = app.receive_message_prev()
         if message != "FOWARDING":
-            print(f"-Mensagem recebida: {message}")
+            print(message)
 
 def recebendo_frente(app : App):
     global mensagem
@@ -29,7 +29,7 @@ def recebendo_frente(app : App):
     while mensagem != "sair":
         message = app.receive_message_next()
         if message != "FOWARDING":
-            print(f"\n-Mensagem recebida: {message}")
+            print(message)
 
 
 id = int(getenv("ID"))
@@ -51,7 +51,7 @@ Seus IPs:      {'e '.join(ip[0])}
 Seus vizinhos: {'e '.join(ip[1])}\
 """)
 
-app = App(id, (ip[SRC][PREV], ip[SRC][NEXT]), (ip[DST][PREV], ip[DST][NEXT]), "192.167.423")
+app = App(id, (ip[SRC][PREV], ip[SRC][NEXT]), (ip[DST][PREV], ip[DST][NEXT]), f"192.168.{id-1}.4")
 wait = input("Enter to start")
 
 enviar = Thread(target=enviando, args=[app])

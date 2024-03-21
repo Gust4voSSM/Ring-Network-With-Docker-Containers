@@ -9,6 +9,7 @@ class App:
     def __init__(self, host: int , ips: tuple[str], neighbors: tuple[str], auth_addr: str):
         self.server_sockets: Dict[str, socket] = {}
         self.shared_keys: Dict[str, bytes] = {}
+        self.hosts = {1 : 'A', 2 : 'B', 3 : 'C', 4 : 'D', 5 : 'E', 6 : 'F'}
         self.host = host    
         self.route = generate_route()
         self.prev = neighbors[0]
@@ -29,6 +30,7 @@ class App:
         self.server_sockets[self.prev_interface].close()
 
     def send_message_to (self, message : str, receiver : int):
+        host_name = self.hosts[receiver]
         receiver_socket, cost = direction_cost(self.route, self.host, receiver)
         if receiver_socket == "prev":
             receiver = self.prev
@@ -38,35 +40,35 @@ class App:
             receiver_socket = self.next_interface
 
         socket = self.server_sockets[receiver_socket]
-        message = pickle.dumps([cost, message])
+        message = pickle.dumps([host_name, cost, message])
         socket.sendto(message, (receiver, SERVER_PORT))
         
     def receive_message_prev(self) -> str:
         socket = self.server_sockets[self.prev_interface]
         message, addr = socket.recvfrom(4096)
-        cost, message = pickle.loads(message)
+        host_name, cost, message = pickle.loads(message)
         if cost == 1:
             #a mensagem é para você
-            return message
+            return f"{host_name}: {message}"
         
         else:
             #se não é pra você, diminui 1 de custo, repassa e retorna dizendo que foi um fowarding
             cost -= 1
-            message = pickle.dumps([cost, message]) 
+            message = pickle.dumps([host_name, cost, message]) 
             socket.sendto(message, (self.next, SERVER_PORT))
             return "FOWARDING"
         
     def receive_message_next(self) -> str:
         socket = self.server_sockets[self.next_interface]
         message, addr = socket.recvfrom(4096)
-        cost, message = pickle.loads(message)
+        host_name, cost, message = pickle.loads(message)
         if cost == 1:
             #a mensagem é para você
-            return message
+            return f"{host_name}: {message}"
         
         else:
             #se não é pra você, diminui 1 de custo, repassa e retorna dizendo que foi um fowarding
             cost -= 1
-            message = pickle.dumps([cost, message]) 
+            message = pickle.dumps([host_name, cost, message]) 
             socket.sendto(message, (self.prev, SERVER_PORT))
             return "FOWARDING"
