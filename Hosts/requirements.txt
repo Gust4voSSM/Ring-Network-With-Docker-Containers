@@ -1,1 +1,5 @@
 numpy
+pycryptodome
+cryptography
+sympy
+dijkstar
