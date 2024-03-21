@@ -2,6 +2,7 @@ from sys import argv as args
 from app import App
 from threading import Thread
 from os import getenv
+from time import sleep
 
 id = int(getenv("ID"))
 assert id > 0
@@ -21,40 +22,17 @@ Seus IPs:      {', '.join(ip[0])}
 Seus vizinhos: {', '.join(ip[1])}\
 """)
 
+app = App((ip[SRC][PREV], ip[SRC][NEXT]), (ip[DST][PREV], ip[DST][NEXT]), f"192.168.{id-1}.4")
+wait = input("Espere todos os binds terminarem")
 
-if(id == 1):
-    app = App((ip[SRC][PREV], ip[SRC][NEXT]), (ip[DST][PREV], ip[DST][NEXT]), "192.168.0.4")
-    wait = input("Espere todos os binds terminarem")
-
+if (id == 1):
     print("enviando mensagem...")
     app.send_message_next("Olá a mensagem chegou?")
     print("mensagem enviada")
-    
-
 elif (id == 2):
-    app = App((ip[SRC][PREV], ip[SRC][NEXT]), (ip[DST][PREV], ip[DST][NEXT]), "192.168.1.4")
-    wait = input("Espere todos os binds terminarem")
-
     print("recebendo mensagem...")
     mensagem = app.receive_from_prev()
     print(f"mensagem recebida: {mensagem}")
-    
-
-elif (id == 3):
-    app = App((ip[SRC][PREV], ip[SRC][NEXT]), (ip[DST][PREV], ip[DST][NEXT]), "192.168.2.4")
-    wait = input("Espere todos os binds terminarem")
-
-elif (id == 4):
-    app = App((ip[SRC][PREV], ip[SRC][NEXT]), (ip[DST][PREV], ip[DST][NEXT]), "192.168.3.4")
-    wait = input("Espere todos os binds terminarem")
-
-elif (id == 5):
-    app = App((ip[SRC][PREV], ip[SRC][NEXT]), (ip[DST][PREV], ip[DST][NEXT]), "192.168.4.4")
-    wait = input("Espere todos os binds terminarem")
-
-else:   
-    app = App((ip[SRC][PREV], ip[SRC][NEXT]), (ip[DST][PREV], ip[DST][NEXT]), "192.168.5.4")
-    wait = input("Espere todos os binds terminarem")
 
 wait = input("Enter to end")
 app.kill_both()
