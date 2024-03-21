@@ -20,6 +20,8 @@ print(f"""\
 Seus IPs:      {'e '.join(ip[0])}
 Seus vizinhos: {'e '.join(ip[1])}\
 """)
+
+
 app = App((ip[SRC][PREV], ip[SRC][NEXT]), (ip[DST][PREV], ip[DST][NEXT]), "192.167.423")
 mensagem = ""
 
@@ -33,3 +35,4 @@ elif (id == 2):
     print(f"mensagem recebida {mensagem}")
 
 wait = input("Start")
+app.kill_both()

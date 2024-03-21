@@ -17,21 +17,51 @@ class App:
         
         for ip in ips:
             server_socket = socket(AF_INET, SOCK_DGRAM)
+            print(f"Ip ao qual o bind está sendo feito {ip}")
             server_socket.bind((ip, SERVER_PORT))
             self.server_sockets[ip] = server_socket
-            #Antes de fazer o diffie tem que checar a autenticidade com a autoridade certificadora 
-            self.shared_keys[ip] = diffie_hellman(self.server_sockets[ip], (ip, SERVER_PORT))
+        print("Binds realizadoz com sucesso")
 
-    def send_message(self, receiver: str, message: str):
-        socket = self.server_sockets[receiver]
-        shared_key = self.shared_keys[receiver]
-        message = pickle.dumps(symmetric_key_encrypt(message, shared_key))
-        socket.sendto(message, (receiver, SERVER_PORT))
+    def generate_shared_key_prev(self):
+        self.shared_keys[self.prev_interface] = diffie_hellman(self.server_sockets[self.prev_interface], (self.prev, SERVER_PORT))
+    
+    def generate_shared_key_next(self):
+         self.shared_keys[self.next_interface] = diffie_hellman(self.server_sockets[self.next_interface], (self.next, SERVER_PORT))
+    
+    def send_message_next(self, message: str):
+        if self.next_interface not in self.shared_keys : self.generate_shared_key_next()
+        socket = self.server_sockets[self.next_interface]
+        shared_key = self.shared_keys[self.next_interface]
+        cipher_text, nonce, tag = symmetric_key_encrypt(message, shared_key)
+        message = pickle.dumps([cipher_text, nonce, tag])
+        socket.sendto(message, (self.next, SERVER_PORT))
 
-    def receive_message(self, sender: str) -> str:
-        socket = self.server_sockets[sender]
-        shared_key = self.shared_keys[sender]
+    def send_message_prev(self, message: str):
+        if self.prev_interface not in self.shared_keys : self.generate_shared_key_prev()
+        socket = self.server_sockets[self.prev_interface]
+        shared_key = self.shared_keys[self.prev_interface]
+        cipher_text, nonce, tag = symmetric_key_encrypt(message, shared_key)
+        message = pickle.dumps([cipher_text, nonce, tag])
+        socket.sendto(message, (self.prev, SERVER_PORT))
+
+    def receive_from_next(self) -> str:
+        if self.next_interface not in self.shared_keys : self.generate_shared_key_next()
+        socket = self.server_sockets[self.next_interface]
+        shared_key = self.shared_keys[self.next_interface]
         message, addr = socket.recvfrom(4096)
-        message = pickle.loads(symmetric_key_decrypt(message, shared_key))
+        cipher_text, nonce, tag = pickle.loads(message)
+        message = symmetric_key_decrypt(cipher_text, nonce, tag, shared_key)
+        return message
+    
+    def receive_from_prev(self) -> str:
+        if self.prev_interface not in self.shared_keys : self.generate_shared_key_prev()
+        socket = self.server_sockets[self.prev_interface]
+        shared_key = self.shared_keys[self.prev_interface]
+        message, addr = socket.recvfrom(4096)
+        cipher_text, nonce, tag = pickle.loads(message)
+        message = symmetric_key_decrypt(cipher_text, nonce, tag, shared_key)
         return message
 
+    def kill_both(self):
+        self.server_sockets[self.prev_interface].close()
+        self.server_sockets[self.prev_interface].close()
