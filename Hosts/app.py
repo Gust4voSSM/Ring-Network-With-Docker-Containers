@@ -22,14 +22,8 @@ class App:
             print(f"Ip ao qual o bind está sendo feito {ip}")
             server_socket.bind((ip, SERVER_PORT))
             self.server_sockets[ip] = server_socket
-        print("Binds realizadoz com sucesso")
+        print("Binds realizados com sucesso")
 
-    def generate_shared_key_prev(self):
-        self.shared_keys[self.prev_interface] = diffie_hellman(self.server_sockets[self.prev_interface], (self.prev, SERVER_PORT))
-    
-    def generate_shared_key_next(self):
-         self.shared_keys[self.next_interface] = diffie_hellman(self.server_sockets[self.next_interface], (self.next, SERVER_PORT))
-    
     def kill_both(self):
         self.server_sockets[self.prev_interface].close()
         self.server_sockets[self.prev_interface].close()
