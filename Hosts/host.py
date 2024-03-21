@@ -17,8 +17,8 @@ ip[DST][PREV] = f"{prefix}.{(id-2)%6}.2"
 ip[DST][NEXT] = f"{prefix}.{(id-1)%6}.3"
 
 print(f"""\
-Seus IPs:      {', '.join(ip[0])}
-Seus vizinhos: {', '.join(ip[1])}\
+Seus IPs:      {'e '.join(ip[0])}
+Seus vizinhos: {'e '.join(ip[1])}\
 """)
 
 
