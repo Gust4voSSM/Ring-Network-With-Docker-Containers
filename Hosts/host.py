@@ -1,6 +1,6 @@
 from sys import argv as args
 from app import App
-from threading import Thread, lock
+from threading import Thread
 from os import getenv
 
 mensagem = "" #Depois usa o lock pra controlar o acesso a mensagem, ou pensa em outro jeito de sair do loop
@@ -52,7 +52,9 @@ Seus vizinhos: {'e '.join(ip[1])}\
 """)
 
 app = App(id, (ip[SRC][PREV], ip[SRC][NEXT]), (ip[DST][PREV], ip[DST][NEXT]), f"192.168.{id-1}.4")
-wait = input("Enter to start")
+wait = input("SUCESSO! Aperte enter para iniciar o chat")
+print("Chat iniciado, pode começar a digitar!\n")
+
 
 enviar = Thread(target=enviando, args=[app])
 receber_1 = Thread(target=recebendo_frente, args=[app])
