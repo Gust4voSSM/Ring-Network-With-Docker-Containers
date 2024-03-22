@@ -18,7 +18,7 @@ class CertifyingAuthority:
         private_key_pem = private_key.private_bytes(
             encoding=serialization.Encoding.PEM,
             format=serialization.PrivateFormat.PKCS8,
-            encryption_algorithm=serialization.NoEncryption()  # Idealmente, deve-se usar uma senha aqui
+            encryption_algorithm=serialization.NoEncryption()
         )
 
         # Armazena a chave pública com o identificador do nó
