@@ -4,7 +4,7 @@ Rede de conteineres docker com topologia em anel. Projeto de Infraestrutura de C
 ## Docker
 Tanto os containers quanto as redes são gerados através do arquivo [compose.yaml](./compose.yaml). Não é necessário realizar builds por comando para gerar as imagens, pois desde que haja conexão com a internet, o compose busca as imagens de um repositório remoto e as instala, builds locais tem privilégio sobre as imagens salvas em repositório, porque o compose busca pela tag `latest`.
 
-### Containres
+### Containers
 Foram usadas duas imagens baseadas em python:3.10-alpine. uma para os [nós da rede](https://hub.docker.com/r/gust4vossm/hosts), e outra para a [autoridade certificadora](https://hub.docker.com/r/gust4vossm/auth). Ambas as imagens estão disponíveis no repositorio Docker Hub.
 
 ### Redes Docker
@@ -25,15 +25,10 @@ networks:
 
 # (...)
 
-    route-5:
-        internal: true
-        ipam:
-            config:
-            -   subnet: 192.168.4.0/24
     route-6:
         internal: true
         ipam:
             config:
             -   subnet: 192.168.5.0/24
-
 ```
+Desta forma, cada nó possui duas interfaces (e portanto, [dois IPs](./compose.yaml#L27#L31)) e só consegue se comunicar com duas subredes, cada sube=rede contendo um nó vizinho e a autoridade certificadora. Já a autoridade certificadora possúi [6 interfaces](./compose.yaml#L8-L20)
