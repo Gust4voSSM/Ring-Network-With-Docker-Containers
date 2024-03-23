@@ -154,19 +154,16 @@ for i in range (1, 7):
 A = Thread(target=auth_A, args=[ips[0]])
 B = Thread(target=auth_B, args=[ips[1]])
 C = Thread(target=auth_C, args=[ips[2]])
-'''
 D = Thread(target=auth_D, args=[ips[3]])
 E = Thread(target=auth_E, args=[ips[4]])
 F = Thread(target=auth_F, args=[ips[5]])
-'''
 
 A.start()
 B.start()
 C.start()
-'''
 D.start()
 E.start()
 F.start()
-'''
+
 
 

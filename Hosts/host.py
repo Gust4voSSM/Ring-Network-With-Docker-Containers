@@ -12,7 +12,10 @@ def enviando(app : App, tabela):
 
     while mensagem != "sair":
         quem = input("Para qual host quer mandar? ")
-        app.send_message_to(mensagem, tabela[quem], host[quem])
+        if quem == "*":
+            app.broadcast(mensagem)
+        else:
+            app.send_message_to(mensagem, tabela[quem], host[quem], False)
         mensagem = input("")
         
     
@@ -39,17 +42,17 @@ host = {'A': 1, 'B': 2, 'C': 3, 'D': 4, 'E': 5, 'F': 6}
 
 match id:
     case 1:
-        tabela = tabela_1
+        tabela = dns_1
     case 2:
-        tabela = tabela_2
+        tabela = dns_2
     case 3:
-        tabela = tabela_3
+        tabela = dns_3
     case 4:
-        tabela = tabela_4      
+        tabela = dns_4      
     case 5:
-        tabela = tabela_5
+        tabela = dns_5
     case 6:
-        tabela = tabela_6
+        tabela = dns_6
 
 PREV, NEXT, SRC, DST = 2*[*range(2)]
 
@@ -67,7 +70,6 @@ Seus vizinhos: {'e '.join(ip[1])}\
 """)
 
 app = App(id, (ip[SRC][PREV], ip[SRC][NEXT]), (ip[DST][PREV], ip[DST][NEXT]), f"192.168.{id-1}.4")
-wait = input("SUCESSO! Aperte enter para iniciar o chat")
 print("Chat iniciado, pode começar a digitar!\n")
 
 
