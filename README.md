@@ -48,3 +48,30 @@ networks:
 Desta forma, cada nó possui duas interfaces (e portanto, [dois IPs](./compose.yaml#L27#L31)) e só consegue se comunicar com duas subredes, cada qual contendo um nó vizinho e a autoridade certificadora. Já a autoridade certificadora possúi [6 interfaces](./compose.yaml#L8-L20), comunicando se com todos os nós. Para simplificar o entendimento, a autoridade sempre usa 4 como hostid em todas os seus ips e os nós sempre usam 2 e 3 respectivamente, como hostids nos ips de interface anterior e posterior.
 
 ![diagrama](./Resources/network_diagram.jpg)
+
+## Hosts (Nós)
+
+Os hosts são executados no arquivo host.py. A variável de ambiente `$ID` permite que todos os nós rodem usando o mesmo arquivo. O `$ID` é usado para [atribuir os ips proceduralmente](./Hosts/host.py#L58-L62) e fazer a [escolha](./Hosts/app.py#L23-L35) das [tabelas de encaminhamento](./README.md#tabelas-de-encaminhamento):
+```python
+# Escolha das tabelas baseado na variavel de ambiente
+match self.host:
+    case 1:
+        self.tabela = tabela_1
+    case 2:
+        self.tabela = tabela_2
+    case 3:
+        self.tabela = tabela_3
+    case 4:
+        self.tabela = tabela_4      
+    case 5:
+        self.tabela = tabela_5
+    case 6:
+        self.tabela = tabela_6
+```
+### Geração procedural dos IPs
+
+### Encaminhamento
+
+### Tabelas de Encaminhamento
+
+O arquivo host.py faz uso da classe App para gerar uma aplicação de chat seguro.
