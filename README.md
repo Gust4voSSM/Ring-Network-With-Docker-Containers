@@ -69,6 +69,22 @@ match self.host:
         self.tabela = tabela_6
 ```
 ### Geração procedural dos IPs
+Os IPs são atribuidos para as interfaces seguinto um conjunto de regras:
+- As interfaces da autoridade certificadora possuem IP da forma 192.168.x.4;
+- As interfaces dos hosts na direção horária são sempre da forma 192.168.x.2;
+- As interfaces dos hosts na direção anti-horária são sempre da forma 192.168.x.3;
+- A subnetid sempre usa o indice da rota -1.
+
+Conhecendo essas informações e usando aritimética modular, é possível gerar os IPs dos hosts proceduralmente:
+```python
+ip = [[int,int],[int, int]] # matrix 2x2
+ip[SRC][PREV] = f"{prefix}.{(id-2)%6}.3"
+ip[SRC][NEXT] = f"{prefix}.{(id-1)%6}.2"
+ip[DST][PREV] = f"{prefix}.{(id-2)%6}.2"
+ip[DST][NEXT] = f"{prefix}.{(id-1)%6}.3"
+```
+
+
 
 ### Encaminhamento
 			Envio e recebimento de mensagens
