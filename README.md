@@ -71,7 +71,15 @@ match self.host:
 ### Geração procedural dos IPs
 
 ### Encaminhamento
+			Envio e recebimento de mensagens
 
+	
+O envio e recebimento de mensagens segue algumas etapas até ser concluído, mostrarei um caso hipotético para exemplificar. Vamos supor que o host B  quer se comunicar com o host A. Para isso, ele pedirá à Autoridade Certificadora a chave pública de A, que vai responder a mandando para B. Após isso, o host B gera uma chave simétrica aleatória e criptografa a mensagem com ela. Além disso, o host B vai criptografar novamente, desta vez com a chave pública de A. Com isso, B encaminha a mensagem para A, que, após receber, descriptografa usando uma chave privada. O resultado disso vai ser uma mensagem e uma chave, que A vai usar para descriptografar de novo, finalmente obtendo a mensagem.
 ### Tabelas de Encaminhamento
 
-O arquivo host.py faz uso da classe App para gerar uma aplicação de chat seguro.
+Tabela de roteamento 
+ Para a criação da tabela de roteamento, criamos os endereços de forma procedural, utilizando aritmética modular. Com isso, definimos os endereços de forma estática no compose.yaml para cada um dos hosts.
+	A partir disso, foram geradas 6 tabelas, uma para cada host. Nelas, está descrita a ação que o host deve tomar para cada possibilidade de IP. Os valores 1 e 0 descrevem para qual interface a mensagem deve sair, sendo o valor 1 para o vizinho à direita e o valor 0 para o vizinho à esquerda.
+	Logo, quando um segmento chega em um host, o host vai checar se o segmento é endereçado para ele, caso não seja, a tabela de roteamento vai ser conferida para decidir o local de encaminhamento.
+	
+
