@@ -98,4 +98,69 @@ Tabela de roteamento
 	A partir disso, foram geradas 6 tabelas, uma para cada host. Nelas, está descrita a ação que o host deve tomar para cada possibilidade de IP. Os valores 1 e 0 descrevem para qual interface a mensagem deve sair, sendo o valor 1 para o vizinho à direita e o valor 0 para o vizinho à esquerda.
 	Logo, quando um segmento chega em um host, o host vai checar se o segmento é endereçado para ele, caso não seja, a tabela de roteamento vai ser conferida para decidir o local de encaminhamento.
 	
+## Authority
 
+### Certifying_Authority.py
+
+**Resumo do Processo:**
+
+A _CertifyingAuthority_ atua como uma entidade confiável que facilita a segurança na comunicação entre partes desconhecidas em uma rede. Inicializa-se escutando em um endereço IP, gera pares de chaves RSA para uso seguro e emprega o protocolo Diffie-Hellman para estabelecer segredos compartilhados seguros, fundamentais para uma comunicação encriptada e autenticada. Este processo ilustra um modelo básico de operações de segurança em redes, incorporando princípios fundamentais de criptografia e troca de chaves.
+
+1. **Inicialização da Autoridade Certificadora (AC):**
+
+- Quando uma instância da _CertifyingAuthority_ é criada, o método __init__ inicializa um socket UDP e o vincula a um endereço IP específico e à porta 8000. Esse socket permite à AC escutar e responder a solicitações de rede.
+- A AC fica então pronta para aceitar conexões e processar solicitações relacionadas à gestão de chaves e autenticação.
+
+2. **Geração dos pares de chaves**
+
+- Quando solicitado, o método _generate_keys_for_node_ é usado para criar um par de chaves RSA, um padrão de criptografia de chave pública utilizado para segurança de dados.
+- Especificidade da RSA: A chave privada é criada com um tamanho de 2048 bits e um expoente público de 65537. Esses valores são escolhidos por serem considerados seguros e eficientes para criptografia.
+- A chave privada é então encriptada usando a senha fornecida pelo solicitante, garantindo que apenas o proprietário da senha possa desencriptá-la e usá-la.
+- As chaves são serializadas no formato PEM, um formato baseado em texto amplamente utilizado para armazenar e compartilhar chaves criptográficas.
+
+3. **Troca de chaves Diffie-Hellman**
+
+- O método _diffie_hellman_ implementa o protocolo de troca de chaves Diffie-Hellman, permitindo que duas partes estabeleçam um segredo compartilhado sobre um canal inseguro.
+Especificidade do Diffie-Hellman: Primeiro, gera-se um número primo aleatório (_random_1_) e troca-se esse número com o par, recebendo outro número primo (_random_2_) em retorno. Os números são ajustados para garantir uma ordem específica.
+- Uma chave privada aleatória é gerada, e a chave pública correspondente é calculada. A chave pública é trocada com o par.
+- Ambas as partes então calculam o segredo compartilhado usando a chave pública recebida do outro e sua própria chave privada. O segredo compartilhado resultante é igual para ambos, apesar de nunca ter sido trocado diretamente, garantindo sua confidencialidade.
+- Este segredo compartilhado pode então ser usado para encriptar a comunicação subsequente, garantindo que apenas as duas partes envolvidas na troca possam decifrá-la.
+
+### auth.py
+
+**Resumo do processo:**
+
+Este processo configura uma rede de servidores de autenticação capazes de gerenciar de forma segura e eficiente as solicitações de chaves públicas e registros de novos usuários ou dispositivos, empregando técnicas avançadas de criptografia e programação concorrente para oferecer um serviço distribuído e resiliente.
+
+**Configuração inicial:**
+
+**Início do processo:** A lista ips é preenchida com endereços IP específicos, destinados a cada servidor de autenticação individual. Esses servidores operarão em paralelo, cada um em sua própria thread, permitindo o processamento concorrente de solicitações.
+
+**Criação e inicialização de servidores:**
+
+Criação de threads: Para cada servidor de autenticação (denotado por funções auth_A até auth_F), uma thread é criada e configurada para executar a função correspondente, passando o endereço IP apropriado como argumento. Isso permite que cada servidor opere simultaneamente em seu próprio contexto de execução.
+
+**Escuta e processamento de dados:**
+
+Loop infinito de escuta: Cada servidor entra em um loop infinito, onde fica escutando solicitações de rede na porta 8000 usando um socket UDP. As solicitações são recebidas em blocos de até 4096 bytes.
+Deserialização de solicitações: As solicitações recebidas são deserializadas usando o módulo pickle, permitindo a extração do host de origem e do tipo de solicitação ("public_key" ou "register").
+
+**Atendimento de solicitações:**
+
+Solicitações de chave pública: Para solicitações de obtenção de chave pública, o servidor busca no dicionário global public_keys pela chave pública associada ao host solicitante e a envia de volta ao solicitante
+
+**Solicitações de registro:**
+
+- Troca de chaves Diffie-Hellman: O servidor realiza uma troca de chaves Diffie-Hellman com o solicitante para estabelecer uma senha segura.
+- Geração de par de chaves RSA: Com a senha estabelecida, o servidor gera um novo par de chaves (privada e pública) para o solicitante. Essa etapa utiliza procedimentos de criptografia RSA para assegurar a segurança das chaves.
+- Armazenamento e envio de chaves: A chave pública do solicitante é armazenada no dicionário public_keys para futuras solicitações, e a chave privada é enviada de volta ao solicitante.
+
+**Concorrência e Distribuição:**
+
+Execução paralela: As threads são iniciadas simultaneamente, permitindo que os servidores de autenticação operem em paralelo. Isso assegura que a infraestrutura possa lidar com múltiplas solicitações simultaneamente, distribuindo a carga de trabalho entre diferentes instâncias de servidor.
+
+**Especificações Requisitadas:**
+
+Diffie-Hellman: Esse método de troca de chaves permite que duas partes estabeleçam uma chave compartilhada segura sem a necessidade de uma conexão segura pré-existente.
+Serialização com pickle: Utilizado para codificar e decodificar as solicitações e respostas transmitidas entre o cliente e o servidor, facilitando o envio de objetos complexos, como dicionários, sobre sockets.
+Criptografia RSA: Escolhida pela sua segurança e praticidade na geração de pares de chaves, essencial para a autenticação e criptografia de dados.
