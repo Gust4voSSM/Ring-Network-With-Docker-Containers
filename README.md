@@ -163,9 +163,13 @@ Execução paralela: As threads são iniciadas simultaneamente, permitindo que o
 Diffie-Hellman: Esse método de troca de chaves permite que duas partes estabeleçam uma chave compartilhada segura sem a necessidade de uma conexão segura pré-existente.
 Serialização com pickle: Utilizado para codificar e decodificar as solicitações e respostas transmitidas entre o cliente e o servidor, facilitando o envio de objetos complexos, como dicionários, sobre sockets.
 Criptografia RSA: Escolhida pela sua segurança e praticidade na geração de pares de chaves, essencial para a autenticação e criptografia de dados.
-
-![image1](./Resources/img1.jpeg) 1 -  Nessa imagem, é possível observar o funcionamento da Autoridade Certificadora gerando as chaves de cada um dos hosts após a inicialização.
-![image2](./Resources/img2.jpeg) 2 - Nessa imagem, é possível observar o estado inicial do host logo na inicialização do chat, pronto para começar a conversa.
-![image3](./Resources/img3.jpeg) ![image4](./Resources/img4.jpeg)3 e 4 - Nessas duas imagens, é possível observar o funcionamento do chat simultâneo entre A e b, de ambos os lados, onde eles trocam mais de 5 mensagens.
-![image5](./Resources/img5.jpeg) 5 - Nessa imagem, todos os outros hosts se comunicam com o host D de maneira simultânea.
-![image6](./Resources/img6.jpeg)6 - Nessa imagem, o host D manda uma mensagem de broadcast, mostrando o seu funcionamento.
+1 -  Nessa imagem, é possível observar o funcionamento da Autoridade Certificadora gerando as chaves de cada um dos hosts após a inicialização.  
+![image1](./Resources/img1.jpeg)  
+2 - Nessa imagem, é possível observar o estado inicial do host logo na inicialização do chat, pronto para começar a conversa.  
+![image2](./Resources/img2.jpeg) 
+3 e 4 - Nessas duas imagens, é possível observar o funcionamento do chat simultâneo entre A e b, de ambos os lados, onde eles trocam mais de 5 mensagens.  
+![image3](./Resources/img3.jpeg)  ![image4](./Resources/img4.jpeg)  
+5 - Nessa imagem, todos os outros hosts se comunicam com o host D de maneira simultânea.  
+![image5](./Resources/img5.jpeg)  
+6 - Nessa imagem, o host D manda uma mensagem de broadcast, mostrando o seu funcionamento.  
+![image6](./Resources/img6.jpeg)  
