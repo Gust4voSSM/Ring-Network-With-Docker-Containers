@@ -95,13 +95,12 @@ class App:
         self.server_sockets[self.prev_interface].close()
         self.server_sockets[self.prev_interface].close()
 
-    def send_message_to (self, message : str, ip : str, receiver : str):
+    def send_message_to (self, message : str, ip : str, receiver : int):
         my_host_name = self.hosts[self.host]
-        their_host_id = receiver
-        public_key = self.request_public_key(their_host_id)
+        public_key = self.request_public_key(receiver)
         message = self.encrypt(message, public_key)
         message = pickle.dumps([my_host_name, ip, message])
-        socket.forward(message, ip)
+        self.forward(message, ip)
         
     def forward (self, message : str, dst_ip : str):
         if self.tabela[dst_ip]:
@@ -124,7 +123,8 @@ class App:
             return f"{host_name}: {message}"
         
         else:
-            socket.forward(message, ip)
+            message = pickle.dumps([host_name, ip, message])
+            self.forward(message, ip)
             return "FOWARDING"
         
     def receive_message_next(self) -> str:
@@ -138,5 +138,6 @@ class App:
             return f"{host_name}: {message}"
         
         else:
-            socket.forward(message, ip)
+            message = pickle.dumps([host_name, ip, message])
+            self.forward(message, ip)
             return "FOWARDING"

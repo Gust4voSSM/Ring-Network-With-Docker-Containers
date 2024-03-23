@@ -1,17 +1,18 @@
 from sys import argv as args
 from app import App
 from threading import Thread
+from tabelaDNS import *
 from os import getenv
 
 mensagem = "" #Depois usa o lock pra controlar o acesso a mensagem, ou pensa em outro jeito de sair do loop
 
-def enviando(app : App):
+def enviando(app : App, tabela):
     global mensagem 
     mensagem = input("")
 
     while mensagem != "sair":
         quem = input("Para qual host quer mandar? ")
-        app.send_message_to(mensagem, host[quem])
+        app.send_message_to(mensagem, tabela[quem], host[quem])
         mensagem = input("")
         
     
@@ -36,6 +37,20 @@ id = int(getenv("ID"))
 assert id > 0
 host = {'A': 1, 'B': 2, 'C': 3, 'D': 4, 'E': 5, 'F': 6}
 
+match id:
+    case 1:
+        tabela = tabela_1
+    case 2:
+        tabela = tabela_2
+    case 3:
+        tabela = tabela_3
+    case 4:
+        tabela = tabela_4      
+    case 5:
+        tabela = tabela_5
+    case 6:
+        tabela = tabela_6
+
 PREV, NEXT, SRC, DST = 2*[*range(2)]
 
 prefix = "192.168"
@@ -56,7 +71,7 @@ wait = input("SUCESSO! Aperte enter para iniciar o chat")
 print("Chat iniciado, pode começar a digitar!\n")
 
 
-enviar = Thread(target=enviando, args=[app])
+enviar = Thread(target=enviando, args=[app, tabela])
 receber_1 = Thread(target=recebendo_frente, args=[app])
 receber_2 = Thread(target=recebendo_atras, args=[app])
 

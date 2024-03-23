@@ -37,33 +37,3 @@ def diffie_hellman(socke, tuple) -> str:
 
     return str(shared_key)
 
-def generate_route () -> Graph:
-    route = Graph ()
-    cost = 1
-    for i in range (1, 6):
-        route.add_edge(i, i+1, cost)
-        route.add_edge(7-i, 6-i, cost)
-
-    route.add_edge(6, 1, cost)
-    route.add_edge(1, 6, cost)
-
-    return route
-    #Gera a tabela de roteamento
-
-def direction_cost(route: Graph, sender: int, receiver: int) -> (str, int):
-    pn, _, _, cost = find_path(route, sender, receiver)
-    if len(pn) <= 1:
-        raise ValueError("Erro: Não é possível enviar uma mensagem para si mesmo.")
-    
-    else:
-        if pn[0] == 1 and pn[1] == 6:
-            pn = "prev"
-        elif pn[0] == 6 and pn[1] == 1:
-            pn = "next"
-        elif pn[0] > pn[1]:
-            pn = "prev"
-        else:
-            pn = "next"
-
-    return pn, cost
-    #Diz para qual direção mandar e quantas vezes mandar
