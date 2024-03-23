@@ -1,1 +1,4 @@
 numpy
+cryptography
+sympy
+rsa

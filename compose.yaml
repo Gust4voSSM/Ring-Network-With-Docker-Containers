@@ -87,26 +87,32 @@ services:
 
 networks:
     route-1:
+        internal: true
         ipam:
             config:
             -   subnet: 192.168.0.0/24
     route-2:
+        internal: true
         ipam:
             config:
             -   subnet: 192.168.1.0/24
     route-3:
+        internal: true
         ipam:
             config:
             -   subnet: 192.168.2.0/24
     route-4:
+        internal: true
         ipam:
             config:
             -   subnet: 192.168.3.0/24
     route-5:
+        internal: true
         ipam:
             config:
             -   subnet: 192.168.4.0/24
     route-6:
+        internal: true
         ipam:
             config:
             -   subnet: 192.168.5.0/24

@@ -1,10 +1,58 @@
 from sys import argv as args
 from app import App
 from threading import Thread
+from tabelaDNS import *
 from os import getenv
+
+mensagem = "" #Depois usa o lock pra controlar o acesso a mensagem, ou pensa em outro jeito de sair do loop
+
+def enviando(app : App, tabela):
+    global mensagem 
+    mensagem = input("")
+
+    while mensagem != "sair":
+        quem = input("Para qual host quer mandar? ")
+        if quem == "*":
+            app.broadcast(mensagem)
+        else:
+            app.send_message_to(mensagem, tabela[quem], host[quem], False)
+        mensagem = input("")
+        
+    
+def recebendo_atras(app : App):
+    global mensagem
+
+    while mensagem != "sair":
+        message = app.receive_message_prev()
+        if message != "FOWARDING":
+            print(message)
+
+def recebendo_frente(app : App):
+    global mensagem
+
+    while mensagem != "sair":
+        message = app.receive_message_next()
+        if message != "FOWARDING":
+            print(message)
+
 
 id = int(getenv("ID"))
 assert id > 0
+host = {'A': 1, 'B': 2, 'C': 3, 'D': 4, 'E': 5, 'F': 6}
+
+match id:
+    case 1:
+        tabela = dns_1
+    case 2:
+        tabela = dns_2
+    case 3:
+        tabela = dns_3
+    case 4:
+        tabela = dns_4      
+    case 5:
+        tabela = dns_5
+    case 6:
+        tabela = dns_6
 
 PREV, NEXT, SRC, DST = 2*[*range(2)]
 
@@ -21,18 +69,20 @@ Seus IPs:      {'e '.join(ip[0])}
 Seus vizinhos: {'e '.join(ip[1])}\
 """)
 
+app = App(id, (ip[SRC][PREV], ip[SRC][NEXT]), (ip[DST][PREV], ip[DST][NEXT]), f"192.168.{id-1}.4")
+print("Chat iniciado, pode começar a digitar!\n")
 
-app = App((ip[SRC][PREV], ip[SRC][NEXT]), (ip[DST][PREV], ip[DST][NEXT]), "192.167.423")
-mensagem = ""
 
-if(id == 1):
-    mensagem = "Olá, a mensagem chegou?"
-    app.send_message(ip[DST][NEXT], mensagem)
-    print(f"mensagem enviada {mensagem}")
+enviar = Thread(target=enviando, args=[app, tabela])
+receber_1 = Thread(target=recebendo_frente, args=[app])
+receber_2 = Thread(target=recebendo_atras, args=[app])
 
-elif (id == 2):
-    mensagem = app.receive_message(ip[DST][PREV])
-    print(f"mensagem recebida {mensagem}")
+enviar.start()
+receber_1.start()
+receber_2.start()
 
-wait = input("Start")
+
+enviar.join()
+receber_1.join()
+receber_2.join()
 app.kill_both()

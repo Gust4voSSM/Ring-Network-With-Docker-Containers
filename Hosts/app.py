@@ -1,67 +1,162 @@
 from socket import socket, AF_INET, SOCK_DGRAM
 from symmetric import symmetric_key_decrypt, symmetric_key_encrypt, diffie_hellman
+from cryptography.hazmat.primitives import serialization, hashes
+from cryptography.hazmat.primitives.asymmetric import padding
+from cryptography.hazmat.primitives.asymmetric import rsa
+from cryptography.hazmat.backends import default_backend
 from typing import Dict
+from tabelaIP import *
+from tabelaDNS import *
 import pickle
 
 SERVER_PORT = 8000
 
 class App:
-    def __init__(self, ips: tuple[str], neighbors: tuple[str], auth_addr: str):
+    def __init__(self, host: int , ips: tuple[str], neighbors: tuple[str], auth_addr: str):
         self.server_sockets: Dict[str, socket] = {}
-        self.shared_keys: Dict[str, bytes] = {}
+        self.hosts = {1 : 'A', 2 : 'B', 3 : 'C', 4 : 'D', 5 : 'E', 6 : 'F'}
+        self.host = host    
         self.prev = neighbors[0]
         self.next = neighbors[1]
         self.auth_addr = auth_addr
         self.prev_interface = ips[0]
         self.next_interface = ips[1]
+        match self.host:
+            case 1:
+                self.tabela_dns = dns_1
+                self.tabela = tabela_1
+            case 2:
+                self.tabela_dns = dns_2
+                self.tabela = tabela_2
+            case 3:
+                self.tabela_dns = dns_3
+                self.tabela = tabela_3
+            case 4:
+                self.tabela_dns = dns_4
+                self.tabela = tabela_4      
+            case 5:
+                self.tabela_dns = dns_5
+                self.tabela = tabela_5
+            case 6:
+                self.tabela_dns = dns_6
+                self.tabela = tabela_6
         
         for ip in ips:
             server_socket = socket(AF_INET, SOCK_DGRAM)
             print(f"Ip ao qual o bind está sendo feito {ip}")
             server_socket.bind((ip, SERVER_PORT))
             self.server_sockets[ip] = server_socket
-        print("Binds realizadoz com sucesso")
+        _ = input("Aperte enter após todos os binds terem terminado")
 
-    def generate_shared_key_prev(self):
-        self.shared_keys[self.prev_interface] = diffie_hellman(self.server_sockets[self.prev_interface], (self.prev, SERVER_PORT))
-    
-    def generate_shared_key_next(self):
-         self.shared_keys[self.next_interface] = diffie_hellman(self.server_sockets[self.next_interface], (self.next, SERVER_PORT))
-    
-    def send_message_next(self, message: str):
-        if self.next_interface not in self.shared_keys : self.generate_shared_key_next()
-        socket = self.server_sockets[self.next_interface]
-        shared_key = self.shared_keys[self.next_interface]
-        cipher_text, nonce, tag = symmetric_key_encrypt(message, shared_key)
-        message = pickle.dumps([cipher_text, nonce, tag])
-        socket.sendto(message, (self.next, SERVER_PORT))
+        #Se cadastrando no CA
+        request = pickle.dumps([self.hosts[self.host], "register"])
+        self.socket_auth = socket(AF_INET, SOCK_DGRAM)
+        self.socket_auth.sendto(request, (self.auth_addr, SERVER_PORT))
+        password = diffie_hellman(self.socket_auth, (self.auth_addr, SERVER_PORT))
+        self.private_key = self.socket_auth.recv(4096)
+        self.private_key = serialization.load_pem_private_key(
+            self.private_key,
+            password=password.encode(),  
+            backend=default_backend()
+        )
+        print("Chave privada obtida com sucesso")
 
-    def send_message_prev(self, message: str):
-        if self.prev_interface not in self.shared_keys : self.generate_shared_key_prev()
-        socket = self.server_sockets[self.prev_interface]
-        shared_key = self.shared_keys[self.prev_interface]
-        cipher_text, nonce, tag = symmetric_key_encrypt(message, shared_key)
-        message = pickle.dumps([cipher_text, nonce, tag])
-        socket.sendto(message, (self.prev, SERVER_PORT))
-
-    def receive_from_next(self) -> str:
-        if self.next_interface not in self.shared_keys : self.generate_shared_key_next()
-        socket = self.server_sockets[self.next_interface]
-        shared_key = self.shared_keys[self.next_interface]
-        message, addr = socket.recvfrom(4096)
-        cipher_text, nonce, tag = pickle.loads(message)
-        message = symmetric_key_decrypt(cipher_text, nonce, tag, shared_key)
-        return message
+    def request_public_key(self, host : int):
+        host_name = self.hosts[host]
+        socket = self.socket_auth
+        request =  pickle.dumps([host_name, "public_key"])
+        socket.sendto(request, (self.auth_addr, SERVER_PORT))
+        public_key = socket.recv(4096)
+        public_key = serialization.load_pem_public_key(
+            public_key,
+            backend=default_backend()
+        )
+        return public_key
     
-    def receive_from_prev(self) -> str:
-        if self.prev_interface not in self.shared_keys : self.generate_shared_key_prev()
-        socket = self.server_sockets[self.prev_interface]
-        shared_key = self.shared_keys[self.prev_interface]
-        message, addr = socket.recvfrom(4096)
-        cipher_text, nonce, tag = pickle.loads(message)
-        message = symmetric_key_decrypt(cipher_text, nonce, tag, shared_key)
+    def encrypt(self, message : str, key_assi) -> bytes:
+        data = symmetric_key_encrypt(message)
+        data = pickle.dumps(data)
+        data = key_assi.encrypt(
+            data,
+            padding.OAEP(
+                mgf=padding.MGF1(algorithm=hashes.SHA256()),
+                algorithm=hashes.SHA256(),
+                label=None
+            )
+        )
+        return data
+    
+    def decrypt(self, data : bytes) -> str:
+        data = self.private_key.decrypt(
+            data,
+            padding.OAEP(
+                mgf=padding.MGF1(algorithm=hashes.SHA256()),
+                algorithm=hashes.SHA256(),
+                label=None
+            )   
+        )
+        cipher_text, nonce, tag, key = pickle.loads(data)
+        message = symmetric_key_decrypt(cipher_text, nonce, tag, key)
         return message
 
     def kill_both(self):
         self.server_sockets[self.prev_interface].close()
         self.server_sockets[self.prev_interface].close()
+
+    def send_message_to (self, message : str, ip : str, receiver : int, broadcast : bool):
+        my_host_name = self.hosts[self.host]
+        public_key = self.request_public_key(receiver)
+        message = self.encrypt(message, public_key)
+        message = pickle.dumps([my_host_name, ip, message, broadcast])
+        self.forward(message, ip)
+
+    def broadcast(self, message):
+        for id, name in self.hosts.items():
+            if id != self.host:
+                self.send_message_to(message, self.tabela_dns[name], id, True)
+
+    def forward (self, message : str, dst_ip : str):
+        if self.tabela[dst_ip]:
+            next_hop_interface = self.next_interface
+            next_hop_ip = self.next
+        else:
+            next_hop_interface = self.prev_interface
+            next_hop_ip = self.prev
+        socket = self.server_sockets[next_hop_interface]
+        socket.sendto(message, (next_hop_ip, SERVER_PORT))
+
+    def receive_message_prev(self) -> str:
+        socket = self.server_sockets[self.prev_interface]
+        message, addr = socket.recvfrom(4096)
+        host_name, ip, message, broadcast = pickle.loads(message)
+        if ip == self.prev_interface:
+            #a mensagem é para você
+            if broadcast:
+                id_host = next(id for id, name in self.hosts.items() if name == host_name)
+                self.send_message_to("BROADCAST ACK", self.tabela_dns[host_name], id_host, False)
+            message = self.decrypt(message)
+            return f"{host_name}: {message}"
+        
+        else:
+            message = pickle.dumps([host_name, ip, message, broadcast])
+            self.forward(message, ip)
+            return "FOWARDING"
+        
+    def receive_message_next(self) -> str:
+        socket = self.server_sockets[self.next_interface]
+        message, addr = socket.recvfrom(4096)
+        host_name, ip, message, broadcast = pickle.loads(message)
+
+        if ip == self.next_interface:
+            #a mensagem é para você
+            if broadcast:
+                id_host = next(id for id, name in self.hosts.items() if name == host_name)
+                self.send_message_to("BROADCAST ACK", self.tabela_dns[host_name], id_host, False)
+            message = self.decrypt(message)
+            return f"{host_name}: {message}"
+        
+        else:
+            message = pickle.dumps([host_name, ip, message, broadcast])
+            self.forward(message, ip)
+            return "FOWARDING"
+        
