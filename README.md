@@ -166,6 +166,6 @@ Criptografia RSA: Escolhida pela sua segurança e praticidade na geração de pa
 
 ![image1](./Resources/img1.jpeg) 1 -  Nessa imagem, é possível observar o funcionamento da Autoridade Certificadora gerando as chaves de cada um dos hosts após a inicialização.
 ![image2](./Resources/img2.jpeg) 2 - Nessa imagem, é possível observar o estado inicial do host logo na inicialização do chat, pronto para começar a conversa.
-![image3](./Resources/img4.jpeg) ![image4](./Resources/img4.jpeg)3 e 4 - Nessas duas imagens, é possível observar o funcionamento do chat simultâneo entre A e b, de ambos os lados, onde eles trocam mais de 5 mensagens.
+![image3](./Resources/img3.jpeg) ![image4](./Resources/img4.jpeg)3 e 4 - Nessas duas imagens, é possível observar o funcionamento do chat simultâneo entre A e b, de ambos os lados, onde eles trocam mais de 5 mensagens.
 ![image5](./Resources/img5.jpeg) 5 - Nessa imagem, todos os outros hosts se comunicam com o host D de maneira simultânea.
 ![image6](./Resources/img6.jpeg)6 - Nessa imagem, o host D manda uma mensagem de broadcast, mostrando o seu funcionamento.
