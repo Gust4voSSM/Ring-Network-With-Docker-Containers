@@ -5,6 +5,7 @@ from cryptography.hazmat.primitives.asymmetric import padding
 from cryptography.hazmat.primitives.asymmetric import rsa
 from cryptography.hazmat.backends import default_backend
 from typing import Dict
+from tabelaIP import *
 import pickle
 
 SERVER_PORT = 8000
@@ -14,12 +15,24 @@ class App:
         self.server_sockets: Dict[str, socket] = {}
         self.hosts = {1 : 'A', 2 : 'B', 3 : 'C', 4 : 'D', 5 : 'E', 6 : 'F'}
         self.host = host    
-        self.route = generate_route()
         self.prev = neighbors[0]
         self.next = neighbors[1]
         self.auth_addr = auth_addr
         self.prev_interface = ips[0]
         self.next_interface = ips[1]
+        match self.host:
+            case 1:
+                self.tabela = tabela_1
+            case 2:
+                self.tabela = tabela_2
+            case 3:
+                self.tabela = tabela_3
+            case 4:
+                self.tabela = tabela_4      
+            case 5:
+                self.tabela = tabela_5
+            case 6:
+                self.tabela = tabela_6
         
         for ip in ips:
             server_socket = socket(AF_INET, SOCK_DGRAM)
@@ -65,7 +78,6 @@ class App:
             )
         )
         return data
-    
     def decrypt(self, data : bytes) -> str:
         data = self.private_key.decrypt(
             data,
@@ -79,59 +91,52 @@ class App:
         message = symmetric_key_decrypt(cipher_text, nonce, tag, key)
         return message
 
-
     def kill_both(self):
         self.server_sockets[self.prev_interface].close()
         self.server_sockets[self.prev_interface].close()
 
-    def send_message_to (self, message : str, receiver : int):
+    def send_message_to (self, message : str, ip : str, receiver : str):
         my_host_name = self.hosts[self.host]
         their_host_id = receiver
-        receiver_socket, cost = direction_cost(self.route, self.host, receiver)
-
-        if receiver_socket == "prev":
-            receiver = self.prev
-            receiver_socket = self.prev_interface
-        else:
-            receiver = self.next
-            receiver_socket = self.next_interface
-
-        socket = self.server_sockets[receiver_socket]
         public_key = self.request_public_key(their_host_id)
         message = self.encrypt(message, public_key)
-        message = pickle.dumps([my_host_name, cost, message])
-        socket.sendto(message, (receiver, SERVER_PORT))
+        message = pickle.dumps([my_host_name, ip, message])
+        socket.forward(message, ip)
         
-        
+    def forward (self, message : str, dst_ip : str):
+        if self.tabela[dst_ip]:
+            next_hop_interface = self.next_interface
+            next_hop_ip = self.next
+        else:
+            next_hop_interface = self.prev_interface
+            next_hop_ip = self.prev
+        socket = self.server_sockets[next_hop_interface]
+        socket.sendto(message, (next_hop_ip, SERVER_PORT))
+
+
     def receive_message_prev(self) -> str:
         socket = self.server_sockets[self.prev_interface]
         message, addr = socket.recvfrom(4096)
-        host_name, cost, message = pickle.loads(message)
-        if cost == 1:
+        host_name, ip, message = pickle.loads(message)
+        if ip == self.prev_interface:
             #a mensagem é para você
             message = self.decrypt(message)
             return f"{host_name}: {message}"
         
         else:
-            #se não é pra você, diminui 1 de custo, repassa e retorna dizendo que foi um fowarding
-            cost -= 1
-            message = pickle.dumps([host_name, cost, message]) 
-            socket.sendto(message, (self.next, SERVER_PORT))
+            socket.forward(message, ip)
             return "FOWARDING"
         
     def receive_message_next(self) -> str:
         socket = self.server_sockets[self.next_interface]
         message, addr = socket.recvfrom(4096)
-        host_name, cost, message = pickle.loads(message)
+        host_name, ip, message = pickle.loads(message)
 
-        if cost == 1:
+        if ip == self.next_interface:
             #a mensagem é para você
             message = self.decrypt(message)
             return f"{host_name}: {message}"
         
         else:
-            #se não é pra você, diminui 1 de custo, repassa e retorna dizendo que foi um fowarding
-            cost -= 1
-            message = pickle.dumps([host_name, cost, message]) 
-            socket.sendto(message, (self.prev, SERVER_PORT))
+            socket.forward(message, ip)
             return "FOWARDING"
