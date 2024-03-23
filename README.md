@@ -87,17 +87,14 @@ ip[DST][NEXT] = f"{prefix}.{(id-1)%6}.3"
 
 
 ### Encaminhamento
-Envio e recebimento de mensagens.
 O envio e recebimento de mensagens segue algumas etapas até ser concluído, mostrarei um caso hipotético para exemplificar. Vamos supor que o host B  quer se comunicar com o host A. Para isso, ele pedirá à Autoridade Certificadora a chave pública de A, que vai responder a mandando para B. Após isso, o host B gera uma chave simétrica aleatória e criptografa a mensagem com ela. Além disso, o host B vai criptografar novamente, desta vez com a chave pública de A. Com isso, B encaminha a mensagem para A, que, após receber, descriptografa usando uma chave privada. O resultado disso vai ser uma mensagem e uma chave, que A vai usar para descriptografar de novo, finalmente obtendo a mensagem.
 
 ### Broadcast
 Para o broadcast, adicionamos uma flag no segmento que indica se aquela mensagem é de broadast ou não. Ao receber um segmento, usamos o pickle para dar um dump nele e o seperarar nas suas partes, após isso vamos verificar se aquele host realmente deveria receber aquela mensagem, se sim, vamos então checar se ela é de broadcast, caso seja, vamos responder o broadcast com um ACK e então printar a mensagem. Já para enviar um broadcast, checamos se o destino daquela mensagem é igual a "*", caso seja, chamamos a função broadcast, que vai setar a flag de broadcast e então enviar a mensagem de broadcast para todos os outros hosts presentes na rede.
 
 ### Tabelas de Encaminhamento
-
-Tabela de roteamento 
- Para a criação da tabela de roteamento, definimos os endereços de forma estática no compose.yaml para cada uma das interfaces. A partir disso, foram geradas 6 tabelas, uma para cada host. Nelas, está descrita a ação que o host deve tomar para cada possibilidade de IP. Os valores 1 e 0 descrevem para qual interface a mensagem deve sair, sendo o valor 1 para o vizinho à direita e o valor 0 para o vizinho à esquerda.
-	Logo, quando um segmento chega em um host, o host vai checar se o segmento é endereçado para ele, caso não seja, a tabela de roteamento vai ser conferida para decidir o local de encaminhamento.
+Para a criação da tabela de roteamento, definimos os endereços de forma estática no compose.yaml para cada uma das interfaces. A partir disso, foram geradas 6 tabelas, uma para cada host. Nelas, está descrita a ação que o host deve tomar para cada possibilidade de IP. Os valores 1 e 0 descrevem para qual interface a mensagem deve sair, sendo o valor 1 para o vizinho à direita e o valor 0 para o vizinho à esquerda.
+Logo, quando um segmento chega em um host, o host vai checar se o segmento é endereçado para ele, caso não seja, a tabela de roteamento vai ser conferida para decidir o local de encaminhamento.
 
 ### Certifying_Authority.py
 
@@ -167,7 +164,7 @@ Criptografia RSA: Escolhida pela sua segurança e praticidade na geração de pa
 ![image1](./Resources/img1.jpeg)  
 2 - Nessa imagem, é possível observar o estado inicial do host logo na inicialização do chat, pronto para começar a conversa.  
 ![image2](./Resources/img2.jpeg)  
-3 e 4 - Nessas duas imagens, é possível observar o funcionamento do chat simultâneo entre A e b, de ambos os lados, onde eles trocam mais de 5 mensagens.  
+3 e 4 - Nessas duas imagens, é possível observar o funcionamento do chat simultâneo entre A e E, de ambos os lados, onde eles trocam mais de 5 mensagens.  
 ![image3](./Resources/img3.jpeg)  ![image4](./Resources/img4.jpeg)  
 5 - Nessa imagem, todos os outros hosts se comunicam com o host D de maneira simultânea.  
 ![image5](./Resources/img5.jpeg)  
