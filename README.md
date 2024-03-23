@@ -89,6 +89,10 @@ ip[DST][NEXT] = f"{prefix}.{(id-1)%6}.3"
 ### Encaminhamento
 Envio e recebimento de mensagens.
 O envio e recebimento de mensagens segue algumas etapas até ser concluído, mostrarei um caso hipotético para exemplificar. Vamos supor que o host B  quer se comunicar com o host A. Para isso, ele pedirá à Autoridade Certificadora a chave pública de A, que vai responder a mandando para B. Após isso, o host B gera uma chave simétrica aleatória e criptografa a mensagem com ela. Além disso, o host B vai criptografar novamente, desta vez com a chave pública de A. Com isso, B encaminha a mensagem para A, que, após receber, descriptografa usando uma chave privada. O resultado disso vai ser uma mensagem e uma chave, que A vai usar para descriptografar de novo, finalmente obtendo a mensagem.
+
+### Broadcast
+Para o broadcast, adicionamos uma flag no segmento que indica se aquela mensagem é de broadast ou não. Ao receber um segmento, usamos o pickle para dar um dump nele e o seperarar nas suas partes, após isso vamos verificar se aquele host realmente deveria receber aquela mensagem, se sim, vamos então checar se ela é de broadcast, caso seja, vamos responder o broadcast com um ACK e então printar a mensagem. Já para enviar um broadcast, checamos se o destino daquela mensagem é igual a "*", caso seja, chamamos a função broadcast, que vai setar a flag de broadcast e então enviar a mensagem de broadcast para todos os outros hosts presentes na rede.
+
 ### Tabelas de Encaminhamento
 
 Tabela de roteamento 
